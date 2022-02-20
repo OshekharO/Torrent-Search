@@ -1,9 +1,9 @@
 # Torrent Search 
 Yet another unique and simple web page for easily grabbing magnet URLs from multiple resources.
 
-##### 👉 Take a look at https://torrentspace.cf/
+##### 👉 Take a look at *(Soon)*
 
 ### Thanks :
-* Me - [@AffanTheBest](https://github.com/AffanTheBest)
-* [@cyberboysumanjay](https://github.com/cyberboysumanjay) for providing Torrent API
+* [AffanTheBest](https://github.com/AffanTheBest) : for base code
+* [Ryuk-me](https://github.com/Ryuk-me/Torrent-Api-py) : for providing Torrent API
 
