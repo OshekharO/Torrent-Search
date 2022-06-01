@@ -36,7 +36,7 @@ async function find(search) {
             query.disabled = false;
 
             try{
-                var apidata = await fetch('https://fastapi-ryuk-me.cloud.okteto.net/api/v1/all/search?query='+search , setHeaders);
+                var apidata = await fetch('https://api.sumanjay.cf/torrent/?query='+search , setHeaders);
                 var actualdata = await apidata.json();
                 
                 if(actualdata[0] == undefined){
@@ -50,7 +50,7 @@ async function find(search) {
                             var htmlData =`
                             <div class='card mb-3'>
                                 <h5 class="name">${actualdata[i].name.substring(0, 80)}</h5>
-                                <h6 class="ls">Leechers : ${actualdata[i].leechers} | Seeders : ${actualdata[i].seeders}</h6>
+                                <h6 class="ls">Leechers : ${actualdata[i].leecher} | Seeders : ${actualdata[i].seeder}</h6>
                                 <div class="btns">
                                     <span title='Copy to magnet to clipboard' onclick="copy('${actualdata[i].magnet}')"> <i class="fas fa-copy icon"></i> </span>
                                     <span title='Open magnet URI' onclick="openMagnet('${actualdata[i].magnet}')"> <i class="fas fa-external-link-alt icon"></i> </span>
