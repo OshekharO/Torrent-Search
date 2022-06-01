@@ -36,7 +36,7 @@ async function find(search) {
             query.disabled = false;
 
             try{
-                var apidata = await fetch('https://api.sumanjay.cf/torrent/?query='+search , setHeaders);
+                var apidata = await fetch('https://torrents-api-py3.herokuapp.com/api/v1/all/search?query='+search , setHeaders);
                 var actualdata = await apidata.json();
                 
                 if(actualdata[0] == undefined){
