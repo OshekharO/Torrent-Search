@@ -36,7 +36,7 @@ async function find(search) {
             query.disabled = false;
 
             try{
-                var apidata = await fetch('https://fastapi-ryuk-me.cloud.okteto.net/api/v1/all/search?query='+search , setHeaders);
+                var apidata = await fetch('https://fastapi-ryuk-me.cloud.okteto.net/api/v1/all/search?query='+search&limit=5 , setHeaders);
                 var actualdata = await apidata.json();
                 
                 if(actualdata[0] == undefined){
