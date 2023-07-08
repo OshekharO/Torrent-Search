@@ -31,7 +31,7 @@ async function find(search) {
             query.disabled = false;
 
             try{
-                var apidata = await fetch('https://news-api.cyclic.app/api/torrent/piratebay/'+search);
+                var apidata = await fetch('https://torrents-api.ryukme.repl.co/api/all/'+search);
                 var actualdata = await apidata.json();
                 
                 if(actualdata[0] == undefined){
