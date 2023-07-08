@@ -7,11 +7,6 @@ window.onload = function() {
         find(params.get('query'));
     }
 }
-const setHeaders = {
-    headers: {
-        Accept: 'application/json',
-    }
-}
 // document.querySelector('#submit').onclick = (e) => {
 //     find(document.querySelector('#query').value);
 // }
@@ -36,7 +31,7 @@ async function find(search) {
             query.disabled = false;
 
             try{
-                var apidata = await fetch('https://api.sumanjay.cf/torrent/?query='+search , setHeaders);
+                var apidata = await fetch('https://news-api.cyclic.app/api/torrent/piratebay/'+search);
                 var actualdata = await apidata.json();
                 
                 if(actualdata[0] == undefined){
