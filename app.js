@@ -24,8 +24,8 @@ async function find(search) {
         query.disabled = false;
 
         try{
-            let api1 = fetch('https://torrents-api.ryukme.repl.co/api/1337x/'+search);
-            let api2 = fetch('https://torrents-api.ryukme.repl.co/api/piratebay/'+search);
+            let api1 = fetch('https://news-api.cyclic.app/api/torrent/1337x/'+search);
+            let api2 = fetch('https://news-api.cyclic.app/api/torrent/piratebay/'+search);
 
             let [apidata1, apidata2] = await Promise.all([api1, api2]);
             let actualdata1 = await apidata1.json();
