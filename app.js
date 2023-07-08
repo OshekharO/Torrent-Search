@@ -44,12 +44,12 @@ async function find(search) {
                         for(let i=0; i < 10; i++) {
                             var htmlData =`
                             <div class='card mb-3'>
-                                <h5 class="name">${actualdata[i].name.substring(0, 80)}</h5>
-                                <h6 class="ls">Leechers : ${actualdata[i].leecher} | Seeders : ${actualdata[i].seeder}</h6>
+                                <h5 class="name">${actualdata[i].Name.substring(0, 80)}</h5>
+                                <h6 class="ls">Leechers : ${actualdata[i].Leechers} | Seeders : ${actualdata[i].Seeders}</h6>
                                 <div class="btns">
-                                    <span title='Copy to magnet to clipboard' onclick="copy('${actualdata[i].magnet}')"> <i class="fas fa-copy icon"></i> </span>
-                                    <span title='Open magnet URI' onclick="openMagnet('${actualdata[i].magnet}')"> <i class="fas fa-external-link-alt icon"></i> </span>
-                                    <span title='Share magnet URI' onclick="share('${actualdata[i].magnet}')"> <i class="fas fa-share icon"></i> </span>
+                                    <span title='Copy to magnet to clipboard' onclick="copy('${actualdata[i].Magnet}')"> <i class="fas fa-copy icon"></i> </span>
+                                    <span title='Open magnet URI' onclick="openMagnet('${actualdata[i].Magnet}')"> <i class="fas fa-external-link-alt icon"></i> </span>
+                                    <span title='Share magnet URI' onclick="share('${actualdata[i].Magnet}')"> <i class="fas fa-share icon"></i> </span>
                                 </div>
                             <div>
                             `; 
