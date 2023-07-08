@@ -7,13 +7,6 @@ window.onload = function() {
         find(params.get('query'));
     }
 }
-// document.querySelector('#submit').onclick = (e) => {
-//     find(document.querySelector('#query').value);
-// }
-
-// document.querySelector('#form').addEventListener('onsubmit', (e) => {
-//     find(document.querySelector('#query').value);
-// })
 
 async function find(search) {
     let result = document.getElementById("result");
@@ -23,51 +16,56 @@ async function find(search) {
     let query_name = document.querySelector('#query_name');
     result.style.display = 'none';
 
-        if(search == ''){
-            alert('Please enter a valid query');
-        }else{
-            loading.style.display = 'block';
-            query.disabled = true;
-            query.disabled = false;
+    if(search == ''){
+        alert('Please enter a valid query');
+    }else{
+        loading.style.display = 'block';
+        query.disabled = true;
+        query.disabled = false;
 
-            try{
-                var apidata = await fetch('https://torrents-api.ryukme.repl.co/api/all/'+search);
-                var actualdata = await apidata.json();
-                
-                if(actualdata[0] == undefined){
-                    result.style.display = 'none';
-                }else{
-                    result_div.innerHTML = "";
-                    result.style.display = 'block';
-                    loading.style.display = 'none';
-                    query_name.innerHTML = `<span>Search Results For <i>'${search}'</i>.</span>`;
-                        for(let i=0; i < 10; i++) {
-                            var htmlData =`
-                            <div class='card mb-3'>
-                                <h5 class="name">${actualdata[i].Name.substring(0, 80)}</h5>
-                                <h6 class="ls">Leechers : ${actualdata[i].Leechers} | Seeders : ${actualdata[i].Seeders}</h6>
-                                <div class="btns">
-                                    <span title='Copy to magnet to clipboard' onclick="copy('${actualdata[i].Magnet}')"> <i class="fas fa-copy icon"></i> </span>
-                                    <span title='Open magnet URI' onclick="openMagnet('${actualdata[i].Magnet}')"> <i class="fas fa-external-link-alt icon"></i> </span>
-                                    <span title='Share magnet URI' onclick="share('${actualdata[i].Magnet}')"> <i class="fas fa-share icon"></i> </span>
-                                </div>
-                            <div>
-                            `; 
-                            result_div.innerHTML += htmlData;
-                        }
-                    query.placeholder = "Enter Your query";
+        try{
+            let api1 = fetch('https://torrents-api.ryukme.repl.co/api/1337x/'+search);
+            let api2 = fetch('https://torrents-api.ryukme.repl.co/api/piratebay/'+search);
 
-                    }
-                
-            }catch(e){
-                        swal("Sorry!","Sorry , we couldn't find torrent related to your query. Please try with some other query.","error");
-                        loading.style.display= "none";
-                        query.value = "";
-                        query.placeholder = "Please try with some other keyword";
-                        query.disabled = false;
+            let [apidata1, apidata2] = await Promise.all([api1, api2]);
+            let actualdata1 = await apidata1.json();
+            let actualdata2 = await apidata2.json();
+            
+            let actualdata = [...actualdata1, ...actualdata2]; // combine the results
+
+            if(actualdata[0] == undefined){
+                result.style.display = 'none';
+            }else{
+                result_div.innerHTML = "";
+                result.style.display = 'block';
+                loading.style.display = 'none';
+                query_name.innerHTML = `<span>Search Results For <i>'${search}'</i>.</span>`;
+                for(let i=0; i < actualdata.length; i++) {
+                    var htmlData =`
+                    <div class='card mb-3'>
+                        <h5 class="name">${actualdata[i].Name.substring(0, 80)}</h5>
+                        <h6 class="ls">Leechers : ${actualdata[i].Leechers} | Seeders : ${actualdata[i].Seeders}</h6>
+                        <div class="btns">
+                            <span title='Copy to magnet to clipboard' onclick="copy('${actualdata[i].Magnet}')"> <i class="fas fa-copy icon"></i> </span>
+                            <span title='Open magnet URI' onclick="openMagnet('${actualdata[i].Magnet}')"> <i class="fas fa-external-link-alt icon"></i> </span>
+                            <span title='Share magnet URI' onclick="share('${actualdata[i].Magnet}')"> <i class="fas fa-share icon"></i> </span>
+                        </div>
+                    <div>
+                    `; 
+                    result_div.innerHTML += htmlData;
                 }
+                query.placeholder = "Enter Your query";
+            }
+        }catch(e){
+            swal("Sorry!","Sorry , we couldn't find torrent related to your query. Please try with some other query.","error");
+            loading.style.display= "none";
+            query.value = "";
+            query.placeholder = "Please try with some other keyword";
+            query.disabled = false;
         }
     }
+}
+
         // FUnuction to copy magnet to clipboard
     function copy(magnet){
             navigator.clipboard.writeText(magnet).then(()=>{
