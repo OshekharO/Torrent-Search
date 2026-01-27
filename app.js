@@ -24,7 +24,7 @@ async function find(search) {
         query.disabled = false;
 
         try{
-            let api1 = fetch('https://news-api-mocha.vercel.app//api/torrent/nyaasi/'+search);
+            let api1 = fetch('https://news-api-mocha.vercel.app/api/torrent/nyaasi/'+search);
             let api2 = fetch('https://news-api-mocha.vercel.app/api/torrent/piratebay/'+search);
 
             let [apidata1, apidata2] = await Promise.all([api1, api2]);
