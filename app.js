@@ -209,7 +209,7 @@ function metaTag(icon, text) {
   return `<span class="meta-tag"><i class="fas ${icon}" aria-hidden="true"></i>${text}</span>`;
 }
 
-// ── Utilities ─────────────────────────────────────────────────────────────────
+// ── Utilities ────────────────────────────────────────────────────────────────
 
 function escapeHtml(str) {
   const el = document.createElement('div');
