@@ -1,25 +1,48 @@
-# Torrent Search 
+# Torrent Search
 
-This is a simple, yet effective, web application for searching torrents and easily grabbing magnet URLs from multiple sources.
-
-The application allows users to enter a search query, which is used to retrieve torrent data from multiple API endpoints. The search results are combined and displayed on the page, and users can easily copy magnet URLs to their clipboard, open the magnet URLs, or share them.
-
-The application also provides a theme switching function, allowing users to toggle between light and dark modes.
+A fast, responsive, and elegant web app for searching torrents across multiple sources simultaneously. Enter any query and instantly browse combined results from **NyaaS** and **PirateBay**, complete with health indicators, file metadata, and one-click magnet actions.
 
 ## Features
 
-- Search torrents from multiple sources
-- Display combined search results
-- Copy magnet URLs to clipboard
-- Open magnet URLs directly
-- Share magnet URLs
-- Toggle between light and dark modes
+- **Multi-source search** — queries NyaaS and PirateBay in parallel and merges results
+- **Rich result cards** — displays name, file size, category, upload date, uploader, and seeder/leecher counts
+- **Health indicator** — colour-coded dot (green / amber / grey) based on seeder count
+- **One-click actions** per result:
+  - Copy magnet link to clipboard
+  - Open magnet URI directly in your torrent client
+  - Visit the original torrent page
+  - Download `.torrent` file *(NyaaS results only)*
+  - Share magnet link via the Web Share API
+- **Sorted by seeders** — healthiest torrents appear first
+- **Dark / Light theme** — toggle persisted in `localStorage`, applied before first render to avoid flash
+- **Fully responsive** — adaptive CSS Grid layout works on mobile, tablet, and desktop
+- **URL-shareable searches** — query is reflected in the URL (`?query=…`) and restored on load
 
-## APIs used
+## Tech Stack
 
-- `https://news-api.cyclic.app`
+- [Bootstrap 5.3](https://getbootstrap.com/) — layout, utilities, and built-in dark-mode theming
+- [Font Awesome 6](https://fontawesome.com/) — icons
+- [Inter](https://fonts.google.com/specimen/Inter) — typeface
+- [SweetAlert](https://sweetalert.js.org/) — user-friendly toast notifications
+- Vanilla JS (ES2020+) — no jQuery
+
+## APIs
+
+| Source     | Endpoint |
+|------------|----------|
+| NyaaS      | `https://news-api-mocha.vercel.app/api/torrent/nyaasi/{query}` |
+| PirateBay  | `https://news-api-mocha.vercel.app/api/torrent/piratebay/{query}` |
+
+## Usage
+
+Open `index.html` in any modern browser — no build step required.
+
+```
+git clone https://github.com/OshekharO/Torrent-Search.git
+cd Torrent-Search
+open index.html
+```
 
 ## Acknowledgements
 
-- [AffanTheBest](https://github.com/AffanTheBest): for base code
-- OpenAI GPT-4: for code review and suggestions
+- [AffanTheBest](https://github.com/AffanTheBest) — original base code

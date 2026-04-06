@@ -104,12 +104,11 @@ async function find(search) {
       (a, b) => (parseInt(b.Seeders) || 0) - (parseInt(a.Seeders) || 0)
     );
 
-    loading.hidden    = false;  // keep visible briefly for smoothness
+    loading.hidden     = true;
     resultsBody.hidden = false;
-    loading.hidden    = true;
 
     if (combined.length === 0) {
-      queryName.innerHTML     = `No results for <em>"${escapeHtml(search)}"</em>`;
+      setQueryLabel(queryName, 'No results for', search);
       resultCount.hidden      = true;
       resultDiv.innerHTML     = `
         <div class="empty-state">
@@ -117,7 +116,7 @@ async function find(search) {
           <p>No torrents found. Try a different search term.</p>
         </div>`;
     } else {
-      queryName.innerHTML     = `Results for <em>"${escapeHtml(search)}"</em>`;
+      setQueryLabel(queryName, 'Results for', search);
       resultCount.textContent = `${combined.length} found`;
       resultCount.hidden      = false;
 
