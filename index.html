@@ -1,45 +1,99 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
-  <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-  <link rel="stylesheet" href="style.css">
-
-  <!-- Scripts  -->
-  <script src="https://kit.fontawesome.com/95931f8504.js" crossorigin="anonymous"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script src="app.js"></script>
-
   <title>Torrent Search</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    crossorigin="anonymous" referrerpolicy="no-referrer">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <img class="theme" src="assets/brightness.svg" title="Theme" onclick="changeTheme()">
-  <div class="main">
-    <div class="center">
-      <form method="GET" class="form py-5 px-2 middle" id="form" >
-      <div class="input-group search_div">
-        <input type="search" class="form-control shadow" id="query" name="query" placeholder="Enter Your Query">
-        <input type="submit" class="input-group-text btn btn-primary shadow" id="submit" value="Search">
-      </div>
-      </form>
 
-      <div class="animation" id="loading"></div>
-      <div class="result mx-auto" id="result">
-        <h3 class="text-left mb-4 text-center" id="query_name"></h3>
-        <div id="result_div">
-          
-        </div>
-      </div>
+  <!-- ── Navbar ─────────────────────────────────────────── -->
+  <nav class="site-nav" id="siteNav">
+    <div class="container-fluid px-4 d-flex align-items-center justify-content-between">
+      <a class="nav-brand" href="index.html">
+        <i class="fas fa-magnet me-2"></i>Torrent Search
+      </a>
+      <button class="theme-btn" id="themeToggle" title="Toggle theme" aria-label="Toggle light/dark theme">
+        <img src="assets/brightness.svg" alt="" id="themeIcon" width="20" height="20">
+      </button>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js"
-      integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW"
-      crossorigin="anonymous"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-</body>
+  </nav>
 
+  <main>
+
+    <!-- ── Hero / Search ──────────────────────────────────── -->
+    <section class="hero-section">
+      <div class="container text-center">
+        <h1 class="hero-title">Find Any Torrent</h1>
+        <p class="hero-subtitle">Searches NyaaS &amp; PirateBay simultaneously</p>
+        <form id="form" class="search-form" autocomplete="off" novalidate>
+          <div class="search-box">
+            <i class="fas fa-magnifying-glass search-icon-left" aria-hidden="true"></i>
+            <input
+              type="search"
+              class="search-input"
+              id="query"
+              name="query"
+              placeholder="Search for movies, anime, games&hellip;"
+              autocomplete="off"
+              spellcheck="false"
+            >
+            <button type="submit" class="search-submit" id="submit">
+              <span class="btn-label">Search</span>
+              <i class="fas fa-arrow-right ms-1" aria-hidden="true"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ── Results ────────────────────────────────────────── -->
+    <section class="results-section container" id="results-section" hidden>
+
+      <div class="results-loading" id="loading" hidden>
+        <div class="spinner-ring" role="status" aria-label="Loading"></div>
+        <span>Searching torrents&hellip;</span>
+      </div>
+
+      <div id="results-body" hidden>
+        <div class="results-header d-flex flex-wrap align-items-center gap-2 mb-4">
+          <h5 class="results-title mb-0" id="query_name"></h5>
+          <span class="results-badge" id="result-count" hidden></span>
+        </div>
+        <div class="results-grid" id="result_div"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ── Footer ────────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="container">
+      <p class="mb-0">
+        <i class="fas fa-magnet me-1" aria-hidden="true"></i>
+        Torrent Search &mdash; data from <strong>NyaaS</strong> &amp; <strong>PirateBay</strong>
+      </p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc4s9bIOgUxi8T/jzmF0q6Y9O2GorBWBEG67Z58BMHZG"
+    crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  <script src="app.js"></script>
+
+</body>
 </html>
