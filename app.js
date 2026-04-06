@@ -7,6 +7,8 @@ let _piratebayPage = 1;
 let _nyaasiDone    = false;
 let _piratebayDone = false;
 
+const LOAD_MORE_HTML = '<i class="fas fa-chevron-down me-2" aria-hidden="true"></i>Load More';
+
 // ── Theme ─────────────────────────────────────────────────────────────────────
 
 (function initTheme() {
@@ -108,7 +110,7 @@ async function _doFetch(append) {
   } else {
     submitBtn.disabled    = true;
     loadMoreBtn.disabled  = true;
-    loadMoreBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Loading\u2026';
+    loadMoreBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-label="Loading"></span>Loading\u2026';
   }
 
   try {
@@ -201,7 +203,7 @@ async function _doFetch(append) {
     submitBtn.disabled = false;
     if (append) {
       loadMoreBtn.disabled  = false;
-      loadMoreBtn.innerHTML = '<i class="fas fa-chevron-down me-2" aria-hidden="true"></i>Load More';
+      loadMoreBtn.innerHTML = LOAD_MORE_HTML;
     }
   }
 }
