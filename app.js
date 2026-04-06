@@ -87,15 +87,19 @@ async function find(search) {
     const base    = 'https://news-api-mocha.vercel.app/api/torrent';
     const encoded = encodeURIComponent(search);
 
-    const [res1, res2] = await Promise.all([
-      fetch(`${base}/nyaasi/${encoded}`),
-      fetch(`${base}/piratebay/${encoded}`)
+    const [result1, result2] = await Promise.allSettled([
+      fetch(`${base}/nyaasi/${encoded}`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+      fetch(`${base}/piratebay/${encoded}`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
     ]);
 
-    let [data1, data2] = await Promise.all([res1.json(), res2.json()]);
+    if (result1.status === 'rejected' && result2.status === 'rejected') {
+      const err = new Error('Both sources failed');
+      err.reasons = [result1.reason, result2.reason];
+      throw err;
+    }
 
-    if (!Array.isArray(data1)) data1 = [];
-    if (!Array.isArray(data2)) data2 = [];
+    let data1 = (result1.status === 'fulfilled' && Array.isArray(result1.value)) ? result1.value : [];
+    let data2 = (result2.status === 'fulfilled' && Array.isArray(result2.value)) ? result2.value : [];
 
     data1 = data1.map(item => ({ ...item, _source: 'NyaaS'     }));
     data2 = data2.map(item => ({ ...item, _source: 'PirateBay' }));
