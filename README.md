@@ -33,16 +33,6 @@ A fast, responsive, and elegant web app for searching torrents across multiple s
 | NyaaS      | `https://news-api-mocha.vercel.app/api/torrent/nyaasi/{query}` |
 | PirateBay  | `https://news-api-mocha.vercel.app/api/torrent/piratebay/{query}` |
 
-## Usage
-
-Open `index.html` in any modern browser — no build step required.
-
-```
-git clone https://github.com/OshekharO/Torrent-Search.git
-cd Torrent-Search
-open index.html
-```
-
 ## Acknowledgements
 
 - [AffanTheBest](https://github.com/AffanTheBest) — original base code
