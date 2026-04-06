@@ -213,6 +213,10 @@ function metaTag(icon, text) {
   return `<span class="meta-tag"><i class="fas ${icon}" aria-hidden="true"></i>${text}</span>`;
 }
 
+function setQueryLabel(el, prefix, query) {
+  el.textContent = `${prefix} "${query}"`;
+}
+
 // ── Utilities ────────────────────────────────────────────────────────────────
 
 function escapeHtml(str) {
