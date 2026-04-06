@@ -260,6 +260,8 @@ body {
   box-shadow:     var(--shadow-sm);
   transition:     transform var(--transition), box-shadow var(--transition), border-color var(--transition);
   animation:      fadeUp .35s ease both;
+  min-width:      0;  /* prevent grid blowout from long content */
+  overflow:       hidden;
 }
 .torrent-card:hover {
   transform:    translateY(-3px);
@@ -312,6 +314,8 @@ body {
   overflow:              hidden;
   margin:                0;
   color:                 var(--text);
+  overflow-wrap:         break-word;
+  word-break:            break-word;
 }
 
 /* Meta row (size, category, date) */
@@ -329,6 +333,10 @@ body {
   background:    var(--surface-2);
   padding:       2px 8px;
   border-radius: 20px;
+  max-width:     100%;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
 }
 .meta-tag i { font-size: .7rem; }
 
@@ -404,6 +412,28 @@ body {
   margin-bottom: 1rem;
   opacity:       .4;
 }
+
+/* Load More button */
+.load-more-btn {
+  background:    var(--surface);
+  border:        1px solid var(--border);
+  border-radius: var(--radius);
+  padding:       10px 36px;
+  font-size:     .9rem;
+  font-weight:   600;
+  font-family:   inherit;
+  color:         var(--text);
+  cursor:        pointer;
+  display:       inline-flex;
+  align-items:   center;
+  transition:    background var(--transition), border-color var(--transition), color var(--transition);
+}
+.load-more-btn:hover {
+  background:   var(--surface-2);
+  border-color: rgba(var(--primary-rgb),.40);
+  color:        var(--primary);
+}
+.load-more-btn:disabled { opacity: .55; cursor: not-allowed; }
 
 /* =====================================================
    Footer

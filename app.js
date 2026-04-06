@@ -1,5 +1,14 @@
 'use strict';
 
+// ── Pagination state ──────────────────────────────────────────────────────────
+let _term          = '';
+let _nyaasiPage    = 1;
+let _piratebayPage = 1;
+let _nyaasiDone    = false;
+let _piratebayDone = false;
+
+const LOAD_MORE_HTML = '<i class="fas fa-chevron-down me-2" aria-hidden="true"></i>Load More';
+
 // ── Theme ─────────────────────────────────────────────────────────────────────
 
 (function initTheme() {
@@ -66,40 +75,82 @@ window.addEventListener('DOMContentLoaded', () => {
 // ── Search ────────────────────────────────────────────────────────────────────
 
 async function find(search) {
-  const section     = document.getElementById('results-section');
-  const loading     = document.getElementById('loading');
-  const resultsBody = document.getElementById('results-body');
-  const resultDiv   = document.getElementById('result_div');
-  const queryName   = document.getElementById('query_name');
-  const resultCount = document.getElementById('result-count');
-  const submitBtn   = document.getElementById('submit');
+  _term          = search;
+  _nyaasiPage    = 1;
+  _piratebayPage = 1;
+  _nyaasiDone    = false;
+  _piratebayDone = false;
+  await _doFetch(false);
+}
 
-  // Show loading state
-  section.hidden      = false;
-  loading.hidden      = false;
-  resultsBody.hidden  = true;
-  resultDiv.innerHTML = '';
-  submitBtn.disabled  = true;
+async function loadMore() {
+  if (_nyaasiDone && _piratebayDone) return;
+  await _doFetch(true);
+}
 
-  section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+async function _doFetch(append) {
+  const section      = document.getElementById('results-section');
+  const loadingEl    = document.getElementById('loading');
+  const resultsBody  = document.getElementById('results-body');
+  const resultDiv    = document.getElementById('result_div');
+  const queryName    = document.getElementById('query_name');
+  const resultCount  = document.getElementById('result-count');
+  const submitBtn    = document.getElementById('submit');
+  const loadMoreWrap = document.getElementById('load-more-wrap');
+  const loadMoreBtn  = document.getElementById('load-more');
+
+  if (!append) {
+    section.hidden      = false;
+    loadingEl.hidden    = false;
+    resultsBody.hidden  = true;
+    resultDiv.innerHTML = '';
+    submitBtn.disabled  = true;
+    loadMoreWrap.hidden = true;
+    section.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } else {
+    submitBtn.disabled    = true;
+    loadMoreBtn.disabled  = true;
+    loadMoreBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-label="Loading"></span>Loading\u2026';
+  }
 
   try {
     const base    = 'https://news-api-mocha.vercel.app/api/torrent';
-    const encoded = encodeURIComponent(search);
+    const encoded = encodeURIComponent(_term);
 
-    const [result1, result2] = await Promise.allSettled([
-      fetch(`${base}/nyaasi/${encoded}`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
-      fetch(`${base}/piratebay/${encoded}`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-    ]);
+    // Only fetch sources that still have pages
+    const toFetch = [];
+    if (!_nyaasiDone)    toFetch.push({ key: 'nyaasi',    page: _nyaasiPage    });
+    if (!_piratebayDone) toFetch.push({ key: 'piratebay', page: _piratebayPage });
 
-    if (result1.status === 'rejected' && result2.status === 'rejected') {
-      const err = new Error('Both sources failed');
-      err.reasons = [result1.reason, result2.reason];
-      throw err;
+    const settled = await Promise.allSettled(
+      toFetch.map(({ key, page }) =>
+        fetch(`${base}/${key}/${encoded}/${page}`)
+          .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+          .then(data => ({ key, data }))
+      )
+    );
+
+    if (settled.every(r => r.status === 'rejected')) {
+      if (!append) throw new Error('All sources failed');
+      swal('Oops!', "Couldn't load more results. Please try again.", 'error');
+      return;
     }
 
-    let data1 = (result1.status === 'fulfilled' && Array.isArray(result1.value)) ? result1.value : [];
-    let data2 = (result2.status === 'fulfilled' && Array.isArray(result2.value)) ? result2.value : [];
+    let data1 = [], data2 = [];
+    for (const r of settled) {
+      if (r.status === 'rejected') continue;
+      const { key, data } = r.value;
+      const arr = Array.isArray(data) ? data : [];
+      if (key === 'nyaasi') {
+        data1 = arr;
+        if (arr.length === 0) _nyaasiDone    = true;
+        else                  _nyaasiPage++;
+      } else {
+        data2 = arr;
+        if (arr.length === 0) _piratebayDone = true;
+        else                  _piratebayPage++;
+      }
+    }
 
     data1 = data1.map(item => ({ ...item, _source: 'NyaaS'     }));
     data2 = data2.map(item => ({ ...item, _source: 'PirateBay' }));
@@ -108,32 +159,52 @@ async function find(search) {
       (a, b) => (parseInt(b.Seeders) || 0) - (parseInt(a.Seeders) || 0)
     );
 
-    loading.hidden     = true;
-    resultsBody.hidden = false;
+    if (!append) {
+      loadingEl.hidden   = true;
+      resultsBody.hidden = false;
 
-    if (combined.length === 0) {
-      setQueryLabel(queryName, 'No results for', search);
-      resultCount.hidden      = true;
-      resultDiv.innerHTML     = `
-        <div class="empty-state">
-          <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
-          <p>No torrents found. Try a different search term.</p>
-        </div>`;
+      if (combined.length === 0) {
+        setQueryLabel(queryName, 'No results for', _term);
+        resultCount.hidden  = true;
+        resultDiv.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
+            <p>No torrents found. Try a different search term.</p>
+          </div>`;
+      } else {
+        setQueryLabel(queryName, 'Results for', _term);
+        resultCount.textContent = `${combined.length} found`;
+        resultCount.hidden      = false;
+
+        const frag = document.createDocumentFragment();
+        combined.forEach((item, i) => frag.appendChild(buildCard(item, i)));
+        resultDiv.appendChild(frag);
+      }
     } else {
-      setQueryLabel(queryName, 'Results for', search);
-      resultCount.textContent = `${combined.length} found`;
-      resultCount.hidden      = false;
-
-      const frag = document.createDocumentFragment();
-      combined.forEach((item, i) => frag.appendChild(buildCard(item, i)));
-      resultDiv.appendChild(frag);
+      if (combined.length > 0) {
+        const offset = resultDiv.querySelectorAll('.torrent-card').length;
+        const frag   = document.createDocumentFragment();
+        combined.forEach((item, i) => frag.appendChild(buildCard(item, offset + i)));
+        resultDiv.appendChild(frag);
+        resultCount.textContent = `${offset + combined.length} found`;
+        resultCount.hidden      = false;
+      }
     }
+
+    loadMoreWrap.hidden = _nyaasiDone && _piratebayDone;
+
   } catch (_err) {
-    loading.hidden  = true;
-    section.hidden  = true;
-    swal('Oops!', "Couldn't fetch results. Please check your connection and try again.", 'error');
+    if (!append) {
+      loadingEl.hidden = true;
+      section.hidden   = true;
+      swal('Oops!', "Couldn't fetch results. Please check your connection and try again.", 'error');
+    }
   } finally {
     submitBtn.disabled = false;
+    if (append) {
+      loadMoreBtn.disabled  = false;
+      loadMoreBtn.innerHTML = LOAD_MORE_HTML;
+    }
   }
 }
 
