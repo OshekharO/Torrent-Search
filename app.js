@@ -59,11 +59,22 @@ window.addEventListener('DOMContentLoaded', () => {
     find(term);
   });
 
+  // Load more button listener
+  const loadMoreBtn = document.getElementById('load-more');
+  if (loadMoreBtn) {
+    loadMoreBtn.addEventListener('click', loadMore);
+  }
+
   // Event delegation — card action buttons
   document.getElementById('result_div').addEventListener('click', (e) => {
     const btn = e.target.closest('[data-action]');
     if (!btn) return;
-    const magnet = decodeURIComponent(btn.getAttribute('data-magnet') || '');
+    let magnet = btn.getAttribute('data-magnet') || '';
+    try {
+      magnet = decodeURIComponent(magnet);
+    } catch (_err) {
+      // Fallback if URI decoding fails due to malformed characters
+    }
     switch (btn.getAttribute('data-action')) {
       case 'copy':  copy(magnet);        break;
       case 'open':  openMagnet(magnet);  break;
@@ -137,8 +148,17 @@ async function _doFetch(append) {
     }
 
     let data1 = [], data2 = [];
-    for (const r of settled) {
-      if (r.status === 'rejected') continue;
+    for (let i = 0; i < toFetch.length; i++) {
+      const target = toFetch[i];
+      const r = settled[i];
+
+      if (r.status === 'rejected') {
+        // Mark source as completed if fetch errored out to prevent infinite loop on loadMore
+        if (target.key === 'nyaasi') _nyaasiDone = true;
+        else if (target.key === 'piratebay') _piratebayDone = true;
+        continue;
+      }
+
       const { key, data } = r.value;
       const arr = Array.isArray(data) ? data : [];
       if (key === 'nyaasi') {
@@ -184,7 +204,8 @@ async function _doFetch(append) {
       if (combined.length > 0) {
         const offset = resultDiv.querySelectorAll('.torrent-card').length;
         const frag   = document.createDocumentFragment();
-        combined.forEach((item, i) => frag.appendChild(buildCard(item, offset + i)));
+        // Use batch index i instead of offset + i for animation delay so appended items animate smoothly without lag
+        combined.forEach((item, i) => frag.appendChild(buildCard(item, i)));
         resultDiv.appendChild(frag);
         resultCount.textContent = `${offset + combined.length} found`;
         resultCount.hidden      = false;
@@ -290,20 +311,49 @@ function setQueryLabel(el, prefix, query) {
 
 // ── Utilities ────────────────────────────────────────────────────────────────
 
+/**
+ * Escapes HTML special characters in a string.
+ * Optimized with string replace to avoid DOM node creation overhead.
+ */
 function escapeHtml(str) {
-  const el = document.createElement('div');
-  el.appendChild(document.createTextNode(String(str ?? '')));
-  return el.innerHTML;
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function copy(magnet) {
-  navigator.clipboard.writeText(magnet)
-    .then(() => swal('Copied!', 'Magnet link copied to clipboard.', 'success'))
-    .catch(() => swal('Error', 'Could not copy. Please copy it manually.', 'error'));
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(magnet)
+      .then(() => swal('Copied!', 'Magnet link copied to clipboard.', 'success'))
+      .catch(() => swal('Error', 'Could not copy. Please copy it manually.', 'error'));
+  } else {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = magnet;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      swal('Copied!', 'Magnet link copied to clipboard.', 'success');
+    } catch (_e) {
+      swal('Error', 'Could not copy. Please copy it manually.', 'error');
+    }
+  }
 }
 
+/**
+ * Opens magnet URI directly in user's default torrent client.
+ * Uses window.location.href to avoid browser popup blocker restrictions.
+ */
 function openMagnet(magnet) {
-  window.open(magnet, '_blank');
+  if (!magnet) return;
+  window.location.href = magnet;
 }
 
 function share(magnet) {
